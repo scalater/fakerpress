@@ -615,6 +615,7 @@ class Admin extends Template {
 
 		Module\Meta::instance();
 		Module\Post::instance();
+		Module\Product::instance();
 		Module\Attachment::instance();
 		Module\Comment::instance();
 		Module\Term::instance();
