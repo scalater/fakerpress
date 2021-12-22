@@ -243,6 +243,24 @@ $fields[] = new Field(
 	]
 );
 
+$fields[] = new Field(
+	'meta',
+	[
+		'id' => 'meta',
+		'config' => [
+			[
+				'type'   => 'number',
+				'name'   => '_regular_price',
+				'weight' => 75,
+				'store'  => 'id',
+			],
+		],
+	],
+	[
+		'label' => __( 'Price', 'fakerpress' ),
+		'description' => __( 'Loremo ipsum', 'fakerpress' ),
+	]
+);
 
 ?>
 <div class='wrap'>
