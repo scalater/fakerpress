@@ -5,6 +5,7 @@ use FakerPress\Variable;
 use FakerPress\Plugin;
 use Faker;
 use FakerPress;
+use WC_Meta_Box_Product_Data;
 
 class Product extends Post {
 
@@ -24,9 +25,7 @@ class Product extends Post {
 		];
 
 		add_filter( "fakerpress.module.{$this->slug}.save", [ $this, 'do_save' ], 10, 4 );
-		add_filter('fakerpress/fields/field-output-taxonomy',[$this, 'woo_product_taxonomy'],999,2);
-
- 
+		add_filter('fakerpress/fields/field-output-taxonomy',[$this, 'woo_product_taxonomy'],999,2); 
 	}
 
 	function woo_product_taxonomy($field_string,$field_obj){
@@ -102,7 +101,10 @@ class Product extends Post {
 	}
 
 	public function do_save( $return_val, $data, $module ) {
+
+		
 		$post_id = wp_insert_post( $data );
+		
 
 		if ( ! is_numeric( $post_id ) ) {
 			return false;
@@ -111,6 +113,18 @@ class Product extends Post {
 		// Flag the Object as FakerPress
 		update_post_meta( $post_id, self::$flag, 1 );
 
+		//Set Product Props
+		if( isset( $_POST["fakerpress"]["meta"]) ){
+			$meta = $_POST["fakerpress"]["meta"];
+			$key_exist = array_search('_regular_price', array_column($meta, 'name'));
+			$regular_price = $key_exist ? $meta[$key_exist]['number']['min'] : null;
+			$key_exist = array_search('_sale_price', array_column($meta, 'name'));
+			$sale_price = $key_exist ? $meta[$key_exist]['number']['min'] : null;
+
+
+			update_post_meta( $post_id, '_regular_price', $regular_price );
+			update_post_meta( $post_id, '_sale_price', $sale_price );
+		}
 		return $post_id;
 	}
 

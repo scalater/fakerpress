@@ -249,7 +249,7 @@ $fields[] = new Field(
 		'id' => 'meta',
 		'config' => [
 			[
-				'type'   => 'number',
+				'type'   => 'numbers',
 				'name'   => '_regular_price',
 				'weight' => 75,
 				'store'  => 'id',
@@ -257,7 +257,26 @@ $fields[] = new Field(
 		],
 	],
 	[
-		'label' => __( 'Price', 'fakerpress' ),
+		'label' => __( 'Regular Price', 'fakerpress' ),
+		'description' => __( 'Loremo ipsum', 'fakerpress' ),
+	]
+);
+
+$fields[] = new Field(
+	'meta',
+	[
+		'id' => 'meta',
+		'config' => [
+			[
+				'type'   => 'numbers',
+				'name'   => '_sale_price',
+				'weight' => 75,
+				'store'  => 'id',
+			],
+		],
+	],
+	[
+		'label' => __( 'Sale Price', 'fakerpress' ),
 		'description' => __( 'Loremo ipsum', 'fakerpress' ),
 	]
 );
