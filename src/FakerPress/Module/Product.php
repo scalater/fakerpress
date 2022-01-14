@@ -24,6 +24,15 @@ class Product extends Post {
 		];
 
 		add_filter( "fakerpress.module.{$this->slug}.save", [ $this, 'do_save' ], 10, 4 );
+		add_filter('fakerpress/fields/field-output-taxonomy',[$this, 'woo_product_taxonomy'],999,2);
+
+ 
+	}
+
+	function woo_product_taxonomy($field_string,$field_obj){
+		$field_obj->field->value = 'product_cat, product_tag';
+		$output = str_replace('value="post_tag, category"','value="product_cat, product_tag"',$field_string)	;		
+		return $output;	
 	}
 
 	/**
