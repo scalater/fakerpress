@@ -6,6 +6,7 @@ use FakerPress\Plugin;
 use Faker;
 use FakerPress;
 use WC_Meta_Box_Product_Data;
+use WC_Product_Factory;
 
 class Product extends Post {
 
@@ -120,12 +121,55 @@ class Product extends Post {
 			$regular_price = $key_exist ? $meta[$key_exist]['number']['min'] : null;
 			$key_exist = array_search('_sale_price', array_column($meta, 'name'));
 			$sale_price = $key_exist ? $meta[$key_exist]['number']['min'] : null;
-
-
-			update_post_meta( $post_id, '_regular_price', $regular_price );
-			update_post_meta( $post_id, '_sale_price', $sale_price );
 		}
+
+		$product_type = empty( $_POST["fakerpress"]['product_type'] ) ? WC_Product_Factory::get_product_type( $post_id ) : sanitize_title( wp_unslash( $_POST["fakerpress"]['product_type'] ) );
+		$classname    = WC_Product_Factory::get_product_classname( $post_id, $product_type ? $product_type : 'simple' );
+		$product      = new $classname( $post_id );			
+		$errors = $product->set_props(
+				array(
+					'downloadable'       => isset( $_POST["fakerpress"]['product_type_downloadable'] ),
+					'virtual'            => isset( $_POST["fakerpress"]['product_type_virtual']),
+					'regular_price'      => $regular_price,
+					'sale_price'         => $sale_price,	
+					'download_limit'     => isset( $_POST['_download_limit'] ) && '' !== $_POST['_download_limit'] ? absint( wp_unslash( $_POST['_download_limit'] ) ) : '',
+					'download_expiry'    => isset( $_POST['_download_expiry'] ) && '' !== $_POST['_download_expiry'] ? absint( wp_unslash( $_POST['_download_expiry'] ) ) : '',	
+					'downloads'          => self::prepare_downloads(
+						isset( $_POST['_wc_file_names'] ) ? wp_unslash( $_POST['_wc_file_names'] ) : array(), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+						isset( $_POST['_wc_file_urls'] ) ? wp_unslash( $_POST['_wc_file_urls'] ) : array(), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+						isset( $_POST['_wc_file_hashes'] ) ? wp_unslash( $_POST['_wc_file_hashes'] ) : array() // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+					),	
+					'product_url'        => isset( $_POST['_product_url'] ) ? esc_url_raw( wp_unslash( $_POST['_product_url'] ) ) : '',		
+					/* 'date_on_sale_from'  => $date_on_sale_from,
+					'date_on_sale_to'    => $date_on_sale_to,
+					'manage_stock'       => ! empty( $_POST['_manage_stock'] ),
+					'backorders'         => isset( $_POST['_backorders'] ) ? wc_clean( wp_unslash( $_POST['_backorders'] ) ) : null,
+					'stock_status'       => isset( $_POST['_stock_status'] ) ? wc_clean( wp_unslash( $_POST['_stock_status'] ) ) : null,
+					'stock_quantity'     => $stock,
+					'low_stock_amount'   => isset( $_POST['_low_stock_amount'] ) && '' !== $_POST['_low_stock_amount'] ? wc_stock_amount( wp_unslash( $_POST['_low_stock_amount'] ) ) : '',*/
+								
+				)
+			);
+		$product->save();
 		return $post_id;
+	}
+	private static function prepare_downloads( $file_names, $file_urls, $file_hashes ) {
+		$downloads = array();
+
+		if ( ! empty( $file_urls ) ) {
+			$file_url_size = count( $file_urls );
+
+			for ( $i = 0; $i < $file_url_size; $i ++ ) {
+				if ( ! empty( $file_urls[ $i ] ) ) {
+					$downloads[] = array(
+						'name'        => wc_clean( $file_names[ $i ] ),
+						'file'        => wp_unslash( trim( $file_urls[ $i ] ) ),
+						'download_id' => wc_clean( $file_hashes[ $i ] ),
+					);
+				}
+			}
+		}
+		return $downloads;
 	}
 
 	public function format_link( $id ) {

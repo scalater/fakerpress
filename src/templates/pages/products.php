@@ -64,6 +64,66 @@ $fields[] = new Field(
 	]
 );
 
+$product_type_selector = apply_filters('product_type_selector', array(
+	'simple' => __('Simple product', 'woocommerce'),
+	'grouped' => __('Grouped product', 'woocommerce'),
+	'external' => __('External/Affiliate product', 'woocommerce'),
+	'variable' => __('Variable product', 'woocommerce'),
+));
+$_json_product_types_output = [];
+foreach ( $product_type_selector as $key => $post_type ) {
+	$_json_product_types_output[] = [
+		'hierarchical' => false,
+		'id' => $key,
+		'text' => $post_type,
+	];
+}
+$fields[] = new Field(
+	'dropdown',
+	[
+		'id' => 'product_type',
+		'multiple' => true,
+		'data-options' => $_json_product_types_output,
+		'value' => 'simple',
+	],
+	[
+		'label' => __( 'Product Type', 'fakerpress' ),
+		'description' => __( 'Woocommerce Product Type', 'fakerpress' ),
+	]
+);
+$fields[] = new Field(
+	'checkbox',
+	[
+		'id' => 'product_type_virtual',
+		'options' => [
+			[
+				'text' => __( 'Virtual Products are intagible and are not shipped', 'fakerpress' ),
+				'value' => 1,
+			],
+		],
+		'value' => 0,
+	],
+	[
+		'label' => __( 'Virtual Product', 'fakerpress' ),
+	]
+);
+$fields[] = new Field(
+	'checkbox',
+	[
+		'id' => 'product_type_downloadable',
+		'options' => [
+			[
+				'text' => __( 'Downloadable Product give access to file upon purchase', 'fakerpress' ),
+				'value' => 1,
+			],
+		],
+		'value' => 0,
+	],
+	[
+		'label' => __( 'Downloadable Product', 'fakerpress' ),
+	]
+);
+
 $fields[] = new Field(
 	'dropdown',
 	[
