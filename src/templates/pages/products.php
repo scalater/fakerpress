@@ -82,8 +82,8 @@ $fields[] = new Field(
 	'dropdown',
 	[
 		'id' => 'product_type',
-		'multiple' => true,
-		'data-options' => $_json_product_types_output,
+		
+		'options' => $_json_product_types_output,
 		'value' => 'simple',
 	],
 	[
