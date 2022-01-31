@@ -91,6 +91,9 @@ $fields[] = new Field(
 		'description' => __( 'Woocommerce Product Type', 'fakerpress' ),
 	]
 );
+
+
+
 $fields[] = new Field(
 	'checkbox',
 	[
@@ -121,6 +124,63 @@ $fields[] = new Field(
 	],
 	[
 		'label' => __( 'Downloadable Product', 'fakerpress' ),
+	]
+);
+
+$fields[] = new Field(
+	'number',
+	[
+		'id' => '_regular_price',
+		'placeholder' => __( 'e.g.: 75', 'fakerpress' ),
+		'min' => 0,
+		'max' => 1000000,
+		'value' => 75,
+	],
+	[
+		'label' => __( 'Regular Price', 'fakerpress' ),
+		'description' => __( 'Product Regular Price', 'fakerpress' ),
+	]
+);
+$fields[] = new Field(
+	'number',
+	[
+		'id' => '_sale_price',
+		'placeholder' => __( 'e.g.: 75', 'fakerpress' ),
+		'min' => 0,
+		'max' => 1000000,
+		'value' => 70,
+	],
+	[
+		'label' => __( 'Sales Price', 'fakerpress' ),
+		'description' => __( 'Product Sales Price', 'fakerpress' ),
+	]
+);
+$stock_status = apply_filters(
+	'woocommerce_product_stock_status_options',
+	array(
+		'instock'     => __( 'In stock', 'woocommerce' ),
+		'outofstock'  => __( 'Out of stock', 'woocommerce' ),
+		'onbackorder' => __( 'On backorder', 'woocommerce' ),
+	));
+$_json_product_types_output = [];
+foreach ( $stock_status as $key => $status ) {
+	$_json_product_types_output[] = [
+		'hierarchical' => false,
+		'id' => $key,
+		'text' => $status,
+	];
+}
+$fields[] = new Field(
+	'dropdown',
+	[
+		'id' => '_stock_status',
+		
+		'options' => $_json_product_types_output,
+		'value' => 'instock',
+	],
+	[
+		'label' => __( 'Stock Status', 'fakerpress' ),
+		'description' => __( 'Controls whether or not the product is listed as "in stock" or "out of stock" on the frontend.', 'fakerpress' ),
 	]
 );
 
@@ -303,43 +363,9 @@ $fields[] = new Field(
 	]
 );
 
-$fields[] = new Field(
-	'meta',
-	[
-		'id' => 'meta',
-		'config' => [
-			[
-				'type'   => 'numbers',
-				'name'   => '_regular_price',
-				'weight' => 75,
-				'store'  => 'id',
-			],
-		],
-	],
-	[
-		'label' => __( 'Regular Price', 'fakerpress' ),
-		'description' => __( 'Loremo ipsum', 'fakerpress' ),
-	]
-);
 
-$fields[] = new Field(
-	'meta',
-	[
-		'id' => 'meta',
-		'config' => [
-			[
-				'type'   => 'numbers',
-				'name'   => '_sale_price',
-				'weight' => 75,
-				'store'  => 'id',
-			],
-		],
-	],
-	[
-		'label' => __( 'Sale Price', 'fakerpress' ),
-		'description' => __( 'Loremo ipsum', 'fakerpress' ),
-	]
-);
+
+
 
 ?>
 <div class='wrap'>
