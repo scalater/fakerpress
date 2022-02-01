@@ -183,6 +183,36 @@ $fields[] = new Field(
 		'description' => __( 'Controls whether or not the product is listed as "in stock" or "out of stock" on the frontend.', 'fakerpress' ),
 	]
 );
+$fields[] = new Field(
+	'checkbox',
+	[
+		'id' => '_manage_stock',
+		'options' => [
+			[
+				'text' => __( 'Enable stock management at product level', 'fakerpress' ),
+				'value' => 1,
+			],
+		],
+		'value' => 0,
+	],
+	[
+		'label' => __( 'Manage stock?', 'fakerpress' ),
+	]
+);
+$fields[] = new Field(
+	'number',
+	[
+		'id' => '_stock',
+		'placeholder' => __( 'e.g.: 75', 'fakerpress' ),
+		'min' => 0,
+		'max' => 1000000,
+		'value' => 0,
+	],
+	[
+		'label' => __( 'Stock quantity', 'fakerpress' ),
+		'description' => __( 'Stock quantity. If this is a variable product this value will be used to control stock for all variations, unless you define stock at variation level.', 'fakerpress' ),
+	]
+);
 
 $fields[] = new Field(
 	'dropdown',

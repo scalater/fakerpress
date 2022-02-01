@@ -117,6 +117,12 @@ class Product extends Post {
 		$product_type = empty( $_POST["fakerpress"]['product_type'] ) ? WC_Product_Factory::get_product_type( $post_id ) : sanitize_title( wp_unslash( $_POST["fakerpress"]['product_type'] ) );
 		$classname    = WC_Product_Factory::get_product_classname( $post_id, $product_type ? $product_type : 'simple' );
 		$product      = new $classname( $post_id );			
+		$stock        = null;
+
+		// Handle stock changes.
+		if ( isset( $_POST["fakerpress"]['_stock'] ) ) {			
+			$stock = wc_stock_amount( wp_unslash( $_POST["fakerpress"]['_stock'] ) );			
+		}
 		$errors = $product->set_props(
 				array(
 					'downloadable'       => isset( $_POST["fakerpress"]['product_type_downloadable'] ),
@@ -130,13 +136,17 @@ class Product extends Post {
 						isset( $_POST['_wc_file_urls'] ) ? wp_unslash( $_POST['_wc_file_urls'] ) : array(), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 						isset( $_POST['_wc_file_hashes'] ) ? wp_unslash( $_POST['_wc_file_hashes'] ) : array() // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 					),	
+					'manage_stock'       => ! empty( $_POST["fakerpress"]['_manage_stock'] ),
+					'stock_quantity'     => $stock,
 					'product_url'        => isset( $_POST['_product_url'] ) ? esc_url_raw( wp_unslash( $_POST['_product_url'] ) ) : '',				
 					'stock_status'       => isset( $_POST["fakerpress"]['_stock_status'] ) ? wc_clean( wp_unslash( $_POST["fakerpress"]['_stock_status'] ) ) : null,
 					
 								
 				)
 			);
-		$product->save();
+		
+		$product->save();	
+		
 		return $post_id;
 	}
 	private static function prepare_downloads( $file_names, $file_urls, $file_hashes ) {
