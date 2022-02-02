@@ -26,9 +26,10 @@ class Product extends Post {
 		];
 
 		add_filter( "fakerpress.module.{$this->slug}.save", [ $this, 'do_save' ], 10, 4 );
-		add_filter('fakerpress/fields/field-output-taxonomy',[$this, 'woo_product_taxonomy'],999,2); 
+		add_filter('fakerpress/fields/field-output-taxonomy',[$this, 'woo_product_taxonomy'],999,2); 		
 	}
 
+	
 	function woo_product_taxonomy($field_string,$field_obj){
 		$field_obj->field->value = 'product_cat, product_tag';
 		$output = str_replace('value="post_tag, category"','value="product_cat, product_tag"',$field_string)	;		
@@ -118,17 +119,21 @@ class Product extends Post {
 		$classname    = WC_Product_Factory::get_product_classname( $post_id, $product_type ? $product_type : 'simple' );
 		$product      = new $classname( $post_id );			
 		$stock        = null;
+		$sale_price   = '';
 
 		// Handle stock changes.
 		if ( isset( $_POST["fakerpress"]['_stock'] ) ) {			
 			$stock = wc_stock_amount( wp_unslash( $_POST["fakerpress"]['_stock'] ) );			
+		}
+		if ( isset( $_POST["fakerpress"]['_sale_price'] ) ) {			
+			$sale_price = wc_clean( wp_unslash( $_POST["fakerpress"]['_sale_price'] ) );		
 		}
 		$errors = $product->set_props(
 				array(
 					'downloadable'       => isset( $_POST["fakerpress"]['product_type_downloadable'] ),
 					'virtual'            => isset( $_POST["fakerpress"]['product_type_virtual']),
 					'regular_price'      => isset( $_POST["fakerpress"]['_regular_price'] ) ? wc_clean( wp_unslash( $_POST["fakerpress"]['_regular_price'] ) ) : null,
-					'sale_price'         => isset( $_POST["fakerpress"]['_sale_price'] ) ? wc_clean( wp_unslash( $_POST["fakerpress"]['_sale_price'] ) ) : null,
+					'sale_price'         => $sale_price,
 					'download_limit'     => isset( $_POST['_download_limit'] ) && '' !== $_POST['_download_limit'] ? absint( wp_unslash( $_POST['_download_limit'] ) ) : '',
 					'download_expiry'    => isset( $_POST['_download_expiry'] ) && '' !== $_POST['_download_expiry'] ? absint( wp_unslash( $_POST['_download_expiry'] ) ) : '',	
 					'downloads'          => self::prepare_downloads(
@@ -146,6 +151,8 @@ class Product extends Post {
 			);
 		
 		$product->save();	
+		//This is required to avoid price rules override sale price field.
+		update_post_meta( $post_id, '_sale_price_manual', $sale_price );
 		
 		return $post_id;
 	}
